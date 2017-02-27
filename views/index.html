@@ -1,0 +1,37 @@
+<html>
+    <head></head>
+    <body>
+        <h1>Chatter</h1>
+        <div class="messages">
+            <h3>Messages</h3>
+            <div id="message-list"></div>
+            <form id="send-message">
+                <input type="text" placeholder="Type here..." />
+                <input type="submit" value="Post" />
+            </form>
+        </div>
+        <script src="/socket.io/socket.io.js"></script>
+        <script type="text/javascript">
+            const form = document.querySelector('#send-message');
+            const messages = document.querySelector('#message-list');
+            const socket = io('http://localhost:3000');
+
+            form.addEventListener('submit', function(evt) {
+                evt.preventDefault();
+                socket.emit('postMsg', {
+                    user: socket.id,
+                    data: evt.target[0].value
+                });
+                evt.target[0].value = '';
+            });
+
+            socket.on('connect', () => {
+                socket.emit('newConnection', 'User Connected');
+            });
+
+            socket.on('newMsg', (data) => {
+                messages.innerHTML += `${data.user} -> ${data.data}<br />`;
+            });
+        </script>
+    </body>
+</html>
